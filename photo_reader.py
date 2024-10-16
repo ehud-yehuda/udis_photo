@@ -4,6 +4,8 @@ import datetime
 import requests
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+import io
+import json
 
 # Define the scope for Google Photos API
 SCOPES = ['https://www.googleapis.com/auth/photoslibrary.readonly']
@@ -14,8 +16,17 @@ def authenticate():
     creds = None
     # Load credentials from token.json if it exists
     file_path: str = 'cred/secrets_fake.json'
-    if os.path.exists(file_path):
-        creds = Credentials.from_authorized_user_file(file_path, SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(
+        file_path, SCOPES
+    )
+    creds = flow.run_local_server(
+        port=0, access_type='offline', prompt='consent'
+    )
+    # if os.path.exists(file_path):
+    #     creds = Credentials.from_authorized_user_file(file_path, SCOPES)
+        # with io.open(file_path, "r", encoding="utf-8") as json_file:
+        #     data = json.load(json_file)
+        #     creds = Credentials.from_authorized_user_info(data["installed"], scopes=SCOPES)
 
     # If there are no valid credentials, let the user log in
     if not creds or not creds.valid:
